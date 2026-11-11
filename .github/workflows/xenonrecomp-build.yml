@@ -1,0 +1,35 @@
+name: Build XenonRecomp
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          path: . # Checkout na raiz do repositório
+
+      - name: Setup Submodules
+        run: |
+          cd XenonRecomp
+          git submodule update --init --recursive
+
+      - name: Configure CMake
+        run: cmake -S XenonRecomp -B XenonRecomp/build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build Project
+        run: cmake --build XenonRecomp/build --config Release
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: XenonRecomp-Release
+          path: XenonRecomp/build/Release/XenonRecomp.exe
+          # Adicionar XenonAnalyse.exe também se for útil
+          # path: XenonRecomp/build/Release/XenonAnalyse.exe
