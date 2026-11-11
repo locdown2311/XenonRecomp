@@ -20,8 +20,15 @@ jobs:
           cd XenonRecomp
           git submodule update --init --recursive
 
-      - name: Configure CMake
-        run: cmake -S XenonRecomp -B XenonRecomp/build -DCMAKE_BUILD_TYPE=Release
+      - name: Install Clang (if not pre-installed)
+        # Nota: Depende de como o windows-latest configura Clang. 
+        # Em alguns ambientes, é necessário instalar via Chocolatey/Winget.
+        run: |
+          # Exemplo genérico, pode precisar de ajuste para a versão 18+
+          choco install llvm --version 18.0.0 # Ajustar versão conforme necessário
+
+      - name: Configure CMake with Clang
+        run: cmake -S XenonRecomp -B XenonRecomp/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_C_COMPILER=clang-cl
 
       - name: Build Project
         run: cmake --build XenonRecomp/build --config Release
